@@ -55,12 +55,12 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
         node.vm.synced_folder ".", "/home/app", owner: "vagrant", group: "vagrant"
         node.vm.provision "file", source: "./scripts", destination: "$HOME/scripts"
         node.vm.provision "file", source: "./samples", destination: "$HOME/samples"
-        node.vm.provision "shell", privileged:false, path:"./scripts/vagrant/provision.sh", args:["#{servers[0][:ip]}","#{ENV['PLATFORM']}"]
+        node.vm.provision "shell", privileged:false, path:"./scripts/vagrant/setup.sh", args:["#{servers[0][:ip]}","#{ENV['PLATFORM']}"]
       end
 
       if node.vm.hostname != "console"
         node.vm.provision "file", source: "./scripts", destination: "$HOME/scripts"
-        node.vm.provision "shell", privileged:false, path:"./scripts/vagrant/provision.sh", args:["#{servers[0][:ip]}","#{ENV['PLATFORM']}"]
+        node.vm.provision "shell", privileged:false, path:"./scripts/vagrant/setup.sh", args:["#{servers[0][:ip]}","#{ENV['PLATFORM']}"]
       end
     end
   end
