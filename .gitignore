@@ -3,6 +3,7 @@ swarm-token
 node-token
 k8s-token
 k8s.install.log
+swarm.install.log
 kube.config
 minikube
 node_modules
