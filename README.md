@@ -1,4 +1,4 @@
-# Vagrant lab
+# Lab
 
 ```yaml
 by: иÐгü
@@ -9,14 +9,7 @@ version: draft
 
 ****
 
-The goal of this POC is to get an environment that can be use as a building block for other POCs. The core technology is based on containers using docker swarm or kubernetes.
-
-I provide provisioning sample scripts for:
-
-- Ubuntu
-- Centos
-- RHEL
-- Windows
+One of the challenges for the developers when building scalable applications is to get an environment as close to the real production environment. The purpose of this library is to provide an easy mechanism to provision a cluster that can be use locally to test contenarized applications.
 
 ## Architecture
 
@@ -24,7 +17,7 @@ The proposed architecture is as follows.
 
 ## The implementation
 
-The lab is provisioned usig [vagrant](https://www.vagrantup.com/intro/index.html) and it gives the option to provision a docker swarm or a kubernetes cluster on different flavors of linux.
+The lab is provisioned usig [vagrant](https://www.vagrantup.com/intro/index.html) encapsulating the complexity thru an easy to use cli.
 
 The vagrant file:
 
@@ -84,17 +77,24 @@ end
 - install [npm](https://docs.npmjs.com/getting-started/what-is-npm)
 - install [vagrant](https://www.vagrantup.com/intro/index.html)
 
+## Quickstart
+
+First you need to install the cli
+
+```shell
+npm install -g @chimpwizard/lab
+```
+
 ### to start the cluster
 
 ```shell
-npm run up:swarm      # To create the docker swarm cluster
-#npm run up:k8s       # To create the kubernetes cluster
+lab up --platform [swarm|k8s]
 ```
 
 ### to clean up your machine
 
 ```shell
-npm run destroy
+lab down
 ```
 
 ## Some references while doing this
@@ -114,11 +114,15 @@ npm run destroy
 - https://www.ipaddressguide.com/cidr
 - https://github.com/oracle/vagrant-boxes/blob/master/Kubernetes/Vagrantfile
 - https://github.com/rootsongjc/kubernetes-vagrant-centos-cluster/blob/master/Vagrantfile
-
+- https://stackoverflow.com/questions/14124234/how-to-pass-parameter-on-vagrant-up-and-have-it-in-the-scope-of-vagrantfile
 
 ## Additional improvements
 
-- Test provisioning scripts for other OS != ubuntu.
+- Add an additional feature to be able to specify the host OS environment
+
+```shell
+lab up --os [ubuntu|centos|debian|rhel|windows]
+```
 
 
 

@@ -10,7 +10,7 @@ echo "------------------"
 
 
 echo "FOLDER: $PWD"
-ls -la
+
 case "$platform" in
 
     swarm)

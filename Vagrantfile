@@ -7,6 +7,26 @@ VAGRANTFILE_API_VERSION = "2"
 Vagrant.require_version ">= 1.8.1"
 ENV['VAGRANT_DEFAULT_PROVIDER'] = 'virtualbox'
 
+require 'getoptlong'
+
+opts = GetoptLong.new(
+  [ '--script-path', GetoptLong::OPTIONAL_ARGUMENT ]
+)
+
+scriptpath=''
+
+opts.ordering=(GetoptLong::REQUIRE_ORDER)   ### this line.
+
+
+opts.each do |opt, arg|
+  case opt
+    when '--script-path'
+      scriptpath=arg
+  end
+end
+
+## puts "scriptpath: #{scriptpath}"
+
 #
 # Order matters b/c we need master kube.config on console
 #
@@ -53,14 +73,14 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
       if node.vm.hostname == "console"
         node.vm.synced_folder ".", "/home/app", owner: "vagrant", group: "vagrant"
-        node.vm.provision "file", source: "./scripts", destination: "$HOME/scripts"
+        node.vm.provision "file", source: "#{scriptpath}/scripts", destination: "$HOME/scripts"
         #node.vm.provision "file", source: "./samples", destination: "$HOME/samples"
-        node.vm.provision "shell", privileged:false, path:"./scripts/vagrant/setup.sh", args:["#{servers[0][:ip]}","#{ENV['PLATFORM']}"]
+        node.vm.provision "shell", privileged:false, path:"#{scriptpath}/scripts/vagrant/setup.sh", args:["#{servers[0][:ip]}","#{ENV['PLATFORM']}"]
       end
 
       if node.vm.hostname != "console"
-        node.vm.provision "file", source: "./scripts", destination: "$HOME/scripts"
-        node.vm.provision "shell", privileged:false, path:"./scripts/vagrant/setup.sh", args:["#{servers[0][:ip]}","#{ENV['PLATFORM']}"]
+        node.vm.provision "file", source: "#{scriptpath}/scripts", destination: "$HOME/scripts"
+        node.vm.provision "shell", privileged:false, path:"#{scriptpath}/scripts/vagrant/setup.sh", args:["#{servers[0][:ip]}","#{ENV['PLATFORM']}"]
       end
     end
   end
