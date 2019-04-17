@@ -1,0 +1,78 @@
+#!/usr/bin/env node
+
+const debug = require('debug')('lab-up');
+const path = require('path');
+const program = require('commander');
+const fs = require('fs');
+const { green, gray, cyan, inverse } = require('chalk');
+const colors = require('colors');
+const { exec } = require('child_process');
+const { execSync } = require('child_process');
+
+var context = {};
+
+
+program
+  .version('0.1.0')
+  .usage('[options]')
+  .option('-p, --platform [name]', 'Platform [swarm] or [k8s]', 'k8s')
+  .parse(process.argv);
+
+
+console.log("PLATFORM: "+ program.platform)
+console.log("GLOBAL: "+ getDefaultGlobalRoot())
+
+up(program.platform);
+
+
+function up(platform) {
+
+  const rootDir = process.cwd();
+  console.log(`rootDir: ${rootDir}`);
+
+  var npmGlobal=getDefaultGlobalRoot();
+  var vagrantFile=`${rootDir}/Vagrantfile`
+  
+  var globalLocation=`${npmGlobal}/@chimpwizard/lab`
+  console.log(`globalLocation: ${globalLocation}`);
+
+  if (!fs.existsSync(vagrantFile)) {
+    vagrantFile=`${globalLocation}/Vagrantfile`
+  }
+  console.log(`vagrantFIle: ${vagrantFile}`);
+  
+  if (!fs.existsSync(vagrantFile)) {
+    console.error(`\n 💥 Vagrantfile doesn't exists \n\n`); 
+  }
+
+  var command = `export PLATFORM="${program.platform}"; export VAGRANT_VAGRANTFILE="${vagrantFile}"; vagrant --script-path="${globalLocation}" up`;
+  //var command = `PLATFORM=${program.platform} vagrant up`;
+
+  execute(command)
+}
+
+function getDefaultGlobalRoot() {
+  return (execSync("npm root -g") + "").trim();
+}
+
+function execute(command) {
+  console.log(`command: ${command}`);
+
+  var child = exec(command, (err, stdout, stderr) => {
+    if (err) {
+      // node couldn't execute the command
+      return;
+    }
+  
+    // the *entire* stdout and stderr (buffered)
+    // console.log(`stdout: ${stdout}`);
+    // console.log(`stderr: ${stderr}`);
+    console.log(stdout.toString()); 
+  });
+
+  child.stdout.on('data', function(data) {
+      console.log(data.toString()); 
+  });
+
+}
+

@@ -1,0 +1,50 @@
+#!/usr/bin/env node
+
+const debug = require('debug')('lab-status');
+const path = require('path');
+const program = require('commander');
+const fs = require('fs');
+const { green, gray, cyan, inverse } = require('chalk');
+const colors = require('colors');
+const { exec } = require('child_process');
+const { execSync } = require('child_process');
+
+var context = {};
+
+
+program
+  .version('0.1.0')
+  .usage('[options]')
+  .parse(process.argv);
+
+  status();
+
+function status() {
+
+  const rootDir = process.cwd();
+  console.log(`rootDir: ${rootDir}`);
+
+  execute(`vagrant ssh console`)
+
+}
+
+function execute(command) {
+  console.log(`command: ${command}`);
+
+  var child = exec(command, (err, stdout, stderr) => {
+    if (err) {
+      // node couldn't execute the command
+      return;
+    }
+  
+    // the *entire* stdout and stderr (buffered)
+    // console.log(`stdout: ${stdout}`);
+    // console.log(`stderr: ${stderr}`);
+  });
+
+  child.stdout.on('data', function(data) {
+      console.log(data.toString()); 
+  });
+
+}
+

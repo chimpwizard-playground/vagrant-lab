@@ -1,0 +1,17 @@
+#!/usr/bin/env node
+
+let loaded = false;
+
+if (loaded) return process.kill();
+
+const program = require('commander');
+const debug = require('debug')('lab');
+
+program
+  .command('up', 'Start lab')
+  .command('down', 'Stop lab')
+  .command('status', 'Lab status')
+  .command('ssh', 'Connect to lab console')
+  .parse(process.argv);
+
+loaded = true;

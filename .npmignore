@@ -1,0 +1,8 @@
+node_modules
+.vagrant
+swarm-token
+node-token
+k8s-token
+k8s.install.log
+kube.config
+minikube
