@@ -48,19 +48,19 @@ sudo usermod -aG docker vagrant
 sudo chmod 777 /var/run/docker.sock
 
 
-echo "---------------------------------------------------------------------"
-echo "Install kubeadmin"
-echo "---------------------------------------------------------------------"
-sudo curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
-sudo echo "deb http://apt.kubernetes.io/ kubernetes-xenial main" > ./tmp
-sudo cp ./tmp /etc/apt/sources.list.d/kubernetes.list
-sudo apt-get update
+# echo "---------------------------------------------------------------------"
+# echo "Install kubeadmin"
+# echo "---------------------------------------------------------------------"
+# sudo curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
+# sudo echo "deb http://apt.kubernetes.io/ kubernetes-xenial main" > ./tmp
+# sudo cp ./tmp /etc/apt/sources.list.d/kubernetes.list
+# sudo apt-get update
 
-#sudo apt-get install -qy kubelet=1.10.0 kubeadm=1.10.0 kubectl=1.10.0 kubernetes-cni=0.6.0
-#sudo apt install -y kubeadm  kubelet kubectl kubernetes-cni
-sudo apt-get install -y kubelet=1.9.0-00 kubeadm=1.9.0-00 kubectl=1.9.0-00
+# #sudo apt-get install -qy kubelet=1.10.0 kubeadm=1.10.0 kubectl=1.10.0 kubernetes-cni=0.6.0
+# #sudo apt install -y kubeadm  kubelet kubectl kubernetes-cni
+# sudo apt-get install -y kubelet=1.9.0-00 kubeadm=1.9.0-00 kubectl=1.9.0-00
 
-#sudo apt install -y kubelet=1.8.4-00 kubernetes-cni=0.5.1-00 kubectl=1.8.4-00 kubeadm=1.8.4-00
+# #sudo apt install -y kubelet=1.8.4-00 kubernetes-cni=0.5.1-00 kubectl=1.8.4-00 kubeadm=1.8.4-00
 
 echo "---------------------------------------------------------------------"
 echo "Set host name resolution"
@@ -80,29 +80,6 @@ sudo echo  '''
 sudo cp /tmp/hosts /etc/hosts
 cat /etc/hosts
 
-# echo 'set nameserver'
-# cp /etc/hosts /tmp/resolv.conf
-# echo "nameserver 8.8.8.8">/tmp/resolv.conf
-# sudo cp /tmp/resolv.conf /etc/resolv.conf
-# cat /etc/resolv.conf
-
-echo "---------------------------------------------------------------------"
-echo "Turn Off swap"
-echo "---------------------------------------------------------------------"
-sudo sed -i '/swap/d' /etc/fstab
-sudo swapoff -a
-# keep swap off after reboot
-sudo sed -i '/ swap / s/^\(.*\)$/#\1/g' /etc/fstab
-
-#configuring Kubernetes to use the same CGroup driver as Docker
-# sed -i '/ExecStart=/a Environment="KUBELET_EXTRA_ARGS=--cgroup-driver=cgroupfs"' /etc/systemd/system/kubelet.service.d/10-kubeadm.conf
-sudo sed -i '0,/ExecStart=/s//Environment="KUBELET_EXTRA_ARGS=--cgroup-driver=cgroupfs"\n&/' /etc/systemd/system/kubelet.service.d/10-kubeadm.conf
-
-# echo "---------------------------------------------------------------------"
-# echo "Check connectivity to kubernetes repos"
-# echo "---------------------------------------------------------------------"
-# sudo kubeadm config images pull
-
 
 if [[ "$HOSTNAME" == master* ]]
 then
@@ -116,31 +93,9 @@ then
  echo "---------------------------------------------------------------------"
  echo "Configure Kubernetes ( node: ${NODENAME} ) and Init Cluster @ $1 IPADDR=${IPADDR}"
  echo "---------------------------------------------------------------------"
-# http://cidr.xyz 
-# node range: 172.17.0.0/24
-# svc  range: 172.17.1.0/24
-# pod  range: 172.16.0.0/16
 
-# node range: 10.17.0.0/24
-# svc  range: 10.17.1.0/24
-# pod  range: 10.244.0.0/16
-
-# --service-cidr default  "10.96.0.0/12"
- #
- # NOTE: After using the default 10* range address the dns CrashLoopBackOff got resolved
- #
- #sudo  kubeadm init --apiserver-advertise-address=$1 --pod-network-cidr=10.244.0.0/16 --apiserver-cert-extra-sans=$1 | tee | awk '/--token/ {print $0}' > /vagrant/k8s-token
- sudo  kubeadm init --apiserver-advertise-address=$1 --pod-network-cidr=10.244.0.0/16 --apiserver-cert-extra-sans=$1,localhost,localhost.localdomain,127.0.0.1 | tee | awk '/--token/ {print $0}' > /vagrant/k8s-token
- #sudo  kubeadm init   | tee | awk '/--token/ {print $0}' > /vagrant/k8s-token
-
-
- ##NOTE use this flag when connecting remotrly --apiserver-cert-extra-sans $fqdn'
-
- echo "---------------------------------------------------------------------"
- echo "Bind on all interfaces and accept connections from any hosts"
- echo "---------------------------------------------------------------------"
- #failing
- #sudo sed -i 's/"KUBECTL_PROXY_ARGS=.*"/"KUBECTL_PROXY_ARGS=--port 8001 --accept-hosts='.*' --address=0.0.0.0"/' /etc/systemd/system/kubectl-proxy.service.d/10-kubectl-proxy.conf
+ curl -sfL https://get.k3s.io | sudo sh -
+ sudo cp /var/lib/rancher/k3s/server/node-token /vagrant/node-token
 
 
  echo "---------------------------------------------------------------------"
@@ -150,36 +105,18 @@ then
  mkdir -p $HOME/.kube
  sudo cp /etc/kubernetes/admin.conf $HOME/.kube/config
  sudo chown vagrant:vagrant $HOME/.kube/config
- sudo cp /etc/kubernetes/admin.conf /vagrant/kube.config
+ sudo cp /etc/kubernetes/admin.conf /vagrant/kube.configkubectl get node
  sudo chmod 777 /vagrant/kube.config
 
- echo "---------------------------------------------------------------------"
- echo "Allow run PODs on master"
- echo "---------------------------------------------------------------------"
- sudo kubectl taint nodes --all node-role.kubernetes.io/master-
- echo "*** CHECK TAINTS"
- sudo kubectl get no -o yaml | grep taint -A 5
-
- echo "---------------------------------------------------------------------"
- echo "Install POD network"
- echo "---------------------------------------------------------------------"
- sudo sysctl net.bridge.bridge-nf-call-iptables=1
-
- sudo kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
- #sudo kubectl apply -f https://cloud.weave.works/k8s/net?k8s-version=$(kubectl version | base64 | tr -d '\n')
- sudo curl https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml|sed 's/"--kube-subnet-mgr"/"--kube-subnet-mgr", "--iface=eth1"/'|sudo kubectl apply -f -
-
+#  echo "---------------------------------------------------------------------"
+#  echo "Allow run PODs on master"
+#  echo "---------------------------------------------------------------------"
+#  sudo kubectl taint nodes --all node-role.kubernetes.io/master-
+#  echo "*** CHECK TAINTS"
+#  sudo kubectl get no -o yaml | grep taint -A 5
 
 
  sudo kubectl get pods --all-namespaces
-
-# AF: This recommended patch didnt work
-#  echo "---------------------------------------------------------------------"
-#  echo "PATCH: for coredns CrashLoopBackOff issue"
-#  echo "---------------------------------------------------------------------"
-#  sudo kubectl -n kube-system get deployment coredns -o yaml | \
-#   sed 's/allowPrivilegeEscalation: false/allowPrivilegeEscalation: true/g' | \
-#   kubectl apply -f -
 
 
 
@@ -197,11 +134,8 @@ then
  echo "---------------------------------------------------------------------"
  echo "Join cluster"
  echo "---------------------------------------------------------------------"
- #kubeadm join --token <token> <master-ip>:<master-port> --discovery-token-ca-cert-hash sha256:<hash>
- sudo sed -i '/swap/d' /etc/fstab
- sudo `cat /vagrant/k8s-token`
+ curl -sfL https://get.k3s.io | sudo K3S_TOKEN=`cat /vagrant/node-token`  K3S_URL=https://master1:6443 sh -
 
- #sudo docker swarm join --token `cat /vagrant/swarm-token` $1:2377
 fi
 
 if [[ "$HOSTNAME" == console* ]]

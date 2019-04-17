@@ -22,8 +22,8 @@ case "$lsb_dist" in
 
     ubuntu)
         echo "UBUNTU"
-        chmod +x ./scripts/vagrant/k8s/ubuntu/provision.sh
-        ./scripts/vagrant/k8s/ubuntu/provision.sh $1
+        chmod +x ./scripts/vagrant/k8s/ubuntu/setup.sh
+        ./scripts/vagrant/k8s/ubuntu/setup.sh $1
     ;;
 
     debian|raspbian)
@@ -32,20 +32,20 @@ case "$lsb_dist" in
 
     centos)
         echo "CENTOS"
-        chmod +x ./scripts/vagrant/k8s/centos/provision.sh
-        ./scripts/vagrant/k8s/centos/provision.sh $1
+        chmod +x ./scripts/vagrant/k8s/centos/setup.sh
+        ./scripts/vagrant/k8s/centos/setup.sh $1
     ;;
 
     rhel|ol|sles)
         echo "RHEL"
-        chmod +x ./scripts/vagrant/rhel/centos/provision.sh 
-        ./scripts/vagrant/k8s/cenrheltos/provision.sh $1
+        chmod +x ./scripts/vagrant/rhel/centos/setup.sh 
+        ./scripts/vagrant/k8s/cenrheltos/setup.sh $1
     ;;
 
     *)
         echo "OTHER"
-        chmod +x ./scripts/vagrant/k8s/other/provision.sh
-        ./scripts/vagrant/k8s/other/provision.sh $1
+        chmod +x ./scripts/vagrant/k8s/other/setup.sh
+        ./scripts/vagrant/k8s/other/setup.sh $1
     ;;
 
 esac
