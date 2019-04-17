@@ -102,10 +102,10 @@ then
  echo "Copy kube.config to to vagrant home"
  echo "---------------------------------------------------------------------"
 
- mkdir -p $HOME/.kube
- sudo cp /etc/kubernetes/admin.conf $HOME/.kube/config
- sudo chown vagrant:vagrant $HOME/.kube/config
- sudo cp /etc/kubernetes/admin.conf /vagrant/kube.configkubectl get node
+ mkdir -p /home/vagrant/.kube
+ sudo cp /etc/rancher/k3s/k3s.yaml /home/vagrant/.kube/config
+ sudo chown vagrant:vagrant /home/vagrant/.kube/config
+ sudo cp /etc/rancher/k3s/k3s.yaml /vagrant/kube.config
  sudo chmod 777 /vagrant/kube.config
 
 #  echo "---------------------------------------------------------------------"
@@ -164,14 +164,27 @@ then
  sudo npm install npm --global
  sudo apt-get install dos2unix
 
+echo "---------------------------------------------------------------------"
+echo "Install kubeadmin"
+echo "---------------------------------------------------------------------"
+sudo curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
+sudo echo "deb http://apt.kubernetes.io/ kubernetes-xenial main" > ./tmp
+sudo cp ./tmp /etc/apt/sources.list.d/kubernetes.list
+sudo apt-get update
+sudo apt-get install -y kubectl=1.9.0-00
+
  echo "---------------------------------------------------------------------"
  echo "Use kube.config for configuration"
  echo "---------------------------------------------------------------------"
  #no need to copy since there is already a mapping to /home/app
- #sudo mkdir -p $HOME/.kube
- #sudo cp /vagrant/kube.config $HOME/.kube/config
+ sudo mkdir -p /home/vagrant/.kube
+ sudo chown vagrant:vagrant /home/vagrant/.kube
+ ##sudo cp /vagrant/kube.config /home/vagrant/.kube/config
+ sudo cp /home/app/kube.config /home/vagrant/.kube/config
+ sudo chown vagrant:vagrant /home/vagrant/.kube/config
  #sudo chown vagrant:vagrant $HOME/.kube/config
- sudo echo "export KUBECONFIG=/home/app/kube.config" >> /home/vagrant/.bashrc
+ sudo sed -i 's/localhost/master1/g' /home/vagrant/.kube/config
+ sudo echo "export KUBECONFIG=/home/vagrant/.kube/config" >> /home/vagrant/.bashrc
 
 
 echo "---------------------------------------------------------------------"
