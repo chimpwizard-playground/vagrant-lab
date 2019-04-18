@@ -10,13 +10,16 @@
   },
   "author": "ndru@chimpwizard.com",
   "license": "ISC",
-  "private": true,
   "scripts": {
     "up:swarm": "PLATFORM=swarm vagrant up|tee swarm.install.log",
     "up:k8s": "PLATFORM=k8s vagrant up|tee k8s.install.log",
     "down": "vagrant destroy -f",
     "console": "vagrant ssh console",
     "deploy": "PLATFORM=k8s vagrant ssh console -c 'cd /home/app;./scripts/vagrant/deploy.sh'"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/chimpwizard-playground/vagrant-lab.git"
   },
   "dependencies": {
     "ansi-styles": "^3.2.1",
