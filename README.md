@@ -11,10 +11,6 @@ version: draft
 
 One of the challenges for the developers when building scalable applications is to get an environment as close to the real production environment. The purpose of this library is to provide an easy mechanism to provision a cluster that can be use locally to test contenarized applications.
 
-## Architecture
-
-The proposed architecture is as follows.
-
 ## The implementation
 
 The lab is provisioned usig [vagrant](https://www.vagrantup.com/intro/index.html) encapsulating the complexity thru an easy to use cli.
