@@ -111,6 +111,8 @@ lab down
 - https://github.com/oracle/vagrant-boxes/blob/master/Kubernetes/Vagrantfile
 - https://github.com/rootsongjc/kubernetes-vagrant-centos-cluster/blob/master/Vagrantfile
 - https://stackoverflow.com/questions/14124234/how-to-pass-parameter-on-vagrant-up-and-have-it-in-the-scope-of-vagrantfile
+- https://stackoverflow.com/questions/42718527/vagrant-up-command-throwing-ssl-error
+
 
 ## Additional improvements
 

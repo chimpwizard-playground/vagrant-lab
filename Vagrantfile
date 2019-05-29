@@ -41,6 +41,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
   servers.each do |machine|
     config.vm.define machine[:hostname] do |node|
+      node.vm.box_download_insecure = true #added by Amos for curl error
       node.vm.box = "bento/ubuntu-16.04"
       #node.vm.provision "docker"
 
