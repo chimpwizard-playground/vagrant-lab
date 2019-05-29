@@ -15,7 +15,7 @@ var context = {};
 program
   .version('0.1.0')
   .usage('[options]')
-  .option('-p, --platform [name]', 'Platform [swarm] or [k8s]', 'k8s')
+  .option('-p, --platform [name]', 'Platform [swarm], [k8s] or [none]', 'k8s')
   .parse(process.argv);
 
 
@@ -45,7 +45,12 @@ function up(platform) {
     console.error(`\n 💥 Vagrantfile doesn't exists \n\n`); 
   }
 
-  var command = `export PLATFORM="${program.platform}"; export VAGRANT_VAGRANTFILE="${vagrantFile}"; vagrant --script-path="${globalLocation}" up`;
+  var nodeName=""
+  if ( platform=="none") {
+    nodeName="console"
+  }
+
+  var command = `export PLATFORM="${program.platform}"; export VAGRANT_VAGRANTFILE="${vagrantFile}"; vagrant --script-path="${globalLocation}" up ${nodeName}`;
   //var command = `PLATFORM=${program.platform} vagrant up`;
 
   execute(command)

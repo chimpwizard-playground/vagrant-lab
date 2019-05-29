@@ -17,15 +17,36 @@ program
   .usage('[options]')
   .parse(process.argv);
 
-  status();
+  ssh();
 
-function status() {
+function ssh() {
 
   const rootDir = process.cwd();
   console.log(`rootDir: ${rootDir}`);
 
-  execute(`vagrant ssh console`)
+  var npmGlobal=getDefaultGlobalRoot();
+  var vagrantFile=`${rootDir}/Vagrantfile`
+  
+  var globalLocation=`${npmGlobal}/@chimpwizard/lab`
+  console.log(`globalLocation: ${globalLocation}`);
 
+  if (!fs.existsSync(vagrantFile)) {
+    vagrantFile=`${globalLocation}/Vagrantfile`
+  }
+  console.log(`vagrantFIle: ${vagrantFile}`);
+  
+  if (!fs.existsSync(vagrantFile)) {
+    console.error(`\n 💥 Vagrantfile doesn't exists \n\n`); 
+  }
+
+  var command = `export PLATFORM="${program.platform}"; export VAGRANT_VAGRANTFILE="${vagrantFile}"; vagrant --script-path="${globalLocation}" ssh console`;
+  //var command = `PLATFORM=${program.platform} vagrant up`;
+
+  execute(command)
+}
+
+function getDefaultGlobalRoot() {
+  return (execSync("npm root -g") + "").trim();
 }
 
 function execute(command) {
@@ -40,6 +61,7 @@ function execute(command) {
     // the *entire* stdout and stderr (buffered)
     // console.log(`stdout: ${stdout}`);
     // console.log(`stderr: ${stderr}`);
+    console.log(stdout.toString()); 
   });
 
   child.stdout.on('data', function(data) {

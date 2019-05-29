@@ -25,6 +25,12 @@ case "$platform" in
         /home/vagrant/scripts/vagrant/k8s/setup.sh $1
     ;;
 
+    none)
+        echo "NONE"
+        chmod +x /home/vagrant/scripts/vagrant/none/setup.sh 
+        /home/vagrant/scripts/vagrant/none/setup.sh $1
+    ;;
+
     *)
         echo "OTHER"
         

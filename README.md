@@ -87,6 +87,12 @@ npm install -g @chimpwizard/lab
 lab up --platform [swarm|k8s]
 ```
 
+### to connect to the console
+
+```shell
+lab ssh
+```
+
 ### to clean up your machine
 
 ```shell
